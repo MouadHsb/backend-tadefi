@@ -4,7 +4,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://tadefi-app.vercel.app']
+  origin: ['http://localhost:3000', 'https://tadefi.vercel.app']
 }));
 
 app.use(express.json({ limit: '50mb' }));
