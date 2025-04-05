@@ -1,50 +1,36 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const productRoutes = require('./routes/products');
 
+// CORS Configuration - More permissive for development
+app.use(cors());  // This enables CORS for all origins by default
 
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://tadefi.vercel.app']
-}));
+// Additional explicit CORS headers for troubleshooting
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  next();
+});
 
-app.use(express.json({ limit: '50mb' }));
+// Middleware to parse JSON requests
+app.use(express.static('public'));
 
-// Simulate skin type analysis
-const analyzeSkinType = () => {
-  const skinTypes = ['dry', 'oily', 'combination', 'sensitive', 'normal'];
-  const skinConcerns = ['aging', 'acne', 'pigmentation', 'redness'];
-  
-  return {
-    type: skinTypes[Math.floor(Math.random() * skinTypes.length)],
-    concern: skinConcerns[Math.floor(Math.random() * skinConcerns.length)]
-  };
-};
+// Mount product routes
+app.use('/api/products', productRoutes);
 
-// Endpoint to process skin image and return analysis
-app.post("/api/analyze-skin", (req, res) => {
-  try {
-    const { imageData } = req.body;
-    
-    // Simulate processing delay
-    setTimeout(() => {
-      // Get skin analysis
-      const skinAnalysis = analyzeSkinType();
-      
-      res.json({
-        success: true,
-        analysis: {
-          skinType: skinAnalysis.type,
-          skinConcern: skinAnalysis.concern
-        }
-      });
-    }, 1500); // Simulate 1.5s processing time
-    
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: "Error analyzing skin image"
-    });
-  }
+// Test route to verify API is working
+app.get('/api', (req, res) => {
+  res.json({ status: 'API is running', message: 'Hello from Tadefi API!' });
+});
+
+// Set port from environment or default to 5000
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Test the API at http://localhost:${PORT}/api`);
 });
 
 module.exports = app;
